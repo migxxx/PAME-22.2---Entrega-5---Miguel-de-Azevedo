@@ -7,4 +7,6 @@ class Products(BaseModel):
 
     id = db.Column(db.Integer, primary_key = True)
     nome = db.Column(db.String(50))
-    estoque = db.Column(db.Integer)
+    tipo = db.Column(db.String(20))
+
+    stock = db.relationship("Stock", backref="products")
