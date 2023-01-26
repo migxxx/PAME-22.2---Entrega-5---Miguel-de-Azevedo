@@ -15,3 +15,9 @@ user_api.add_url_rule(
     view_func = UserDetails.as_view("users_details"),
     methods = ["GET", "PUT", "PATCH", "DELETE"]
 )
+
+user_api.add_url_rule(
+    "/login",
+    view_func= UserLogin.as_view("user_login"),
+    methods = ["POST"]
+)

@@ -1,8 +1,10 @@
 from flask import request
 from flask.views import MethodView
 
-from .schemas import UserSchema
+from .schemas import UserSchema, LoginSchema
 from .models import Users
+
+from flask_jwt_extended import create_access_token, jwt_required
 
 # /users
 class UserController(MethodView): # classe de controle de usuarios
@@ -26,18 +28,11 @@ class UserController(MethodView): # classe de controle de usuarios
 
         return schema.dump(user), 201
 
-        # OBS: É interessante implementar uma senha padrão para o sistema, simulando um cofre,\
-        # assim ao realizar o post, o usuário solicitante é perguntado qual a senha padrão, fazendo uma segurança básica do software
-        # e impossibilitando de pessoas que não são funcionários acessarem funções essenciais.
-
-        # Tal senha padrão pode ser implementada pelo Front-End, por se tratar de uma interação com o usuário.
-
-        # EXEMPLO REAL: Quem tem TV da NET sabe, que ao acessar um canal que está tendo algum filme de classificação 16+ \
-        # é necessário introduzir uma senha (que normalmente é 0000) para continuar.
-
 
 # /users/<id>
 class UserDetails(MethodView): # classe de detalhes de um usuario
+
+    decorators = [jwt_required()] # decorator para proteger a rota
 
     def get(self,id):
         schema = UserSchema()
@@ -91,3 +86,22 @@ class UserDetails(MethodView): # classe de detalhes de um usuario
         
         user.delete(user)
         return{}, 204
+
+# binario (senha.encode), bcrypt.gensalt(adiciona textos aleatorios), bcrypt.hashpw (transforma a senha em hash)
+
+class UserLogin(MethodView):
+    def post(self):
+        schema = LoginSchema()
+        data = schema.load(request.json)
+
+        user = Users.query.filter_by(username = data["username"]).first()
+
+        if not user:
+            return {"error": "user not found"}, 404
+
+        if not user.check_password(data["password"]):
+            return {"error": "invalid password"}, 401
+
+        token = create_access_token(identity = user.id)
+
+        return {"user": UserSchema().dump(user), "token": token}, 200
