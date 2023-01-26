@@ -13,7 +13,14 @@ from .models import Products
 class ProductController(MethodView):
     def get(self):
         schema = ProductSchema()
-        products = Products.query.all()
+        data = request.args     # pega os parametros passados na url
+        tipo = data.get("tipo") # filtragem por tipo
+
+        if not tipo:
+            products = Products.query.all()     # retorna todos os produtos
+            return schema.dump(products, many=True), 200
+
+        products = Products.query.filter_by(tipo = tipo).all() # retorna todos os produtos que contem o nome passado
 
         return schema.dump(products, many=True), 200
 
@@ -98,16 +105,3 @@ class ProductDetails(MethodView):
         product.delete(product)
         
         return{}, 204                                       
-
-# /products/<type>
-class FilterByProductType(MethodView):
-
-    def get(self, type):
-        schema = ProductSchema()
-
-        product = Products.query.filter(Products.tipo.endswith(type)).all()
-        # print(product)
-        if not product:
-            return {"error": "type of product does not exist"}, 404
-
-        return schema.dump(product, many=True), 200

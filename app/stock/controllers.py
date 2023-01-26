@@ -8,7 +8,7 @@ from .schemas import StockSchema
 
 from app.products.models import Products
 
-# /products/stock
+# /stock
 class StockController(MethodView):
     def get(self):
         schema = StockSchema()

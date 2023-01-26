@@ -5,7 +5,7 @@ from .controllers import *
 stock_api = Blueprint("stock_api", __name__)
 
 stock_api.add_url_rule(
-    "/products/stock",
+    "/stock",
     view_func = StockController.as_view("stock_controller"),
     methods = ["GET"]
 )
