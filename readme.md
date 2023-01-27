@@ -1,3 +1,8 @@
+Entrega 6 - PAME 22.2 FLUXO
+
+
+
+
 Project made utilizing virtualenv, to install all the modules required for the application run, please do the following steps:
 
 1. cd to the directory where requirements.txt is located
